@@ -3,8 +3,8 @@ const app = express();
 
 app.use(express.json());
 
-const blog = require('./routes/routes.articles');
-app.use('/', blog);
+const articlesRoutes = require('./routes/routes.articles');
+app.use('/', articlesRoutes);
 
 
 
