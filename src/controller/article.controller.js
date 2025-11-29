@@ -23,7 +23,7 @@ const articleController = {
     create: async (req, res) =>{
         const { title, content } = req.body;
         try{
-            if(!title && !content){
+            if(!title || !content){
                 res.status(400).json({success: false, message: "To create an article you need both the title and content of the article"});
             }else{
                 const postArticle = await ArticleService.createArticle(req.body);

@@ -2,7 +2,7 @@ const db = require('../database/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-async function registerUser({userID, frist_name, last_name, date_of_birth, email, password}){
+async function registerUser({userID, first_name, last_name, date_of_birth, email, password}){
 
     const checkUser = await db.query("SELECT * FROM users WHERE userID = $1", [userID]);
     if(checkUser){
@@ -13,19 +13,19 @@ async function registerUser({userID, frist_name, last_name, date_of_birth, email
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const results = awaitdb.query(
+    const results = await db.query(
         `INSTERT INTO users(first_name, last_name, date_of_birth, email, password)
         VALUES($1, $2, $3, $4, $5) RETURNING *`,
-        [frist_name, last_name, date_of_birth, email, hashedPassword]);
+        [first_name, last_name, date_of_birth, email, hashedPassword]);
 
     return results.rows[0];
 }
 
-async function loginUser({userID, email, password}){
+async function loginUser({email, password}){
 
     const getUser = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
-    if(getUser.results.length === 0){
+    if(getUser.rows.length === 0){
         const error = new Error("User not found");
         error.statusCode = 404;
         throw error;
@@ -40,7 +40,7 @@ async function loginUser({userID, email, password}){
     }
 
     const token = jwt.sign(
-        {userID: userID.rows[0].userID, email: email.rows[0].email},
+        {userID: getUser.rows[0].userID, email: getUser.rows[0].email},
         "tupperware",
         {expiresIn: "1h"}
     );

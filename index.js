@@ -3,8 +3,11 @@ const app = express();
 
 app.use(express.json());
 
-const articlesRoutes = require('./routes/routes.articles');
+const articlesRoutes = require('./src/routes/routes.articles');
 app.use('/', articlesRoutes);
+
+const authRoutes = require('./src/routes/auth.routes');
+app.use('/', authRoutes);
 
 
 
