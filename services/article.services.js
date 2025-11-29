@@ -14,7 +14,7 @@ const articleService = {
         }else{
             results = await db.query("SELECT * FROM articles ORDER BY created_at DESC");
         }
-        return results.rows;  
+        return results.rows; // returns an array of all matching records from the dbS 
     },
 
     createArticle: async ({title, content, author, tags}) =>{
