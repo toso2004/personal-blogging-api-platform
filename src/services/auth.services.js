@@ -39,6 +39,7 @@ async function loginUser({email, password}){
         throw error;
     }
 
+        //Create a jwt token
     const token = jwt.sign(
         {userID: getUser.rows[0].userID, email: getUser.rows[0].email},
         "tupperware",
