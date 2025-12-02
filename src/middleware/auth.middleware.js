@@ -7,16 +7,16 @@ const jwt = require('jsonwebtoken');
 
     
     if(!authHeader){
-       res.status(401).json({
+       return res.status(401).json({
             success: false,
             message: "Not authorized. Missing token"
         }); 
     }
 
-    const token = authHeader.split(" ")[1];
+    const encoded = authHeader.split(" ")[1];
         
     try{
-        const decoded = jwt.verify(token, "tupperware");
+        const decoded = jwt.verify(encoded, "tupperware");
         req.user = decoded;
         next();
     }catch(e){

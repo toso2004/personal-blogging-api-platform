@@ -2,10 +2,10 @@ const db = require('../database/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-async function registerUser({userID, first_name, last_name, date_of_birth, email, password}){
+async function registerUser({ first_name, last_name, date_of_birth, email, password}){
 
-    const checkUser = await db.query("SELECT * FROM users WHERE userID = $1", [userID]);
-    if(checkUser){
+    const checkUser = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+    if(checkUser.rows.length > 0){
         const error = new Error("User with this account already exists");
         error.statusCode = 409;
         throw error;
@@ -14,7 +14,7 @@ async function registerUser({userID, first_name, last_name, date_of_birth, email
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const results = await db.query(
-        `INSTERT INTO users(first_name, last_name, date_of_birth, email, password)
+        `INSERT INTO users(first_name, last_name, date_of_birth, email, password)
         VALUES($1, $2, $3, $4, $5) RETURNING *`,
         [first_name, last_name, date_of_birth, email, hashedPassword]);
 
@@ -41,7 +41,7 @@ async function loginUser({email, password}){
 
         //Create a jwt token
     const token = jwt.sign(
-        {userID: getUser.rows[0].userID, email: getUser.rows[0].email},
+        {userID: getUser.rows[0].user_id, email: getUser.rows[0].email},
         "tupperware",
         {expiresIn: "1h"}
     );

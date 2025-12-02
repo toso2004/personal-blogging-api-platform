@@ -1,7 +1,7 @@
 const express = require('express');
 const AuthService = require('../services/auth.services');
 
-async function registerController({req, res}){
+async function registerController(req, res){
     const { first_name, last_name, date_of_birth, email, password } = req.body;
 
     try{
@@ -29,10 +29,10 @@ async function loginController(req, res){
     const { email, password } = req.body;
 
     try{
-        const validateUser = await AuthService.loginUser({email, password});
+        const { getUser, token } = await AuthService.loginUser({email, password});
         res.status(200).json({
             success: true,
-            data: {validateUser, token}
+            data: getUser, token
         })
     }catch(e){
         res.status(e.statusCode || 500).json({
