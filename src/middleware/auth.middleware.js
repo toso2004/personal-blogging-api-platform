@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const db = require('../database/db');
 
  function verifyUser(req, res, next){
 
@@ -27,4 +28,7 @@ const jwt = require('jsonwebtoken');
     }   
 }
 
-module.exports = { verifyUser } ;
+
+
+
+module.exports = { verifyUser} ;

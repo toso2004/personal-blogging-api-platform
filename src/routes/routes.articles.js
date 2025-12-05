@@ -5,10 +5,10 @@ const user = require('../middleware/auth.middleware');
 
 router.get('/articles', articleController.get);
 
-router.post('/post', user.verifyUser, articleController.create);
+router.post('/post/', user.verifyUser, articleController.create);
 
-router.put('/edit/:id', user.verifyUser, articleController.update);
+router.put('/edit', user.verifyUser, articleController.update);
 
-router.delete('/delete/:id', user.verifyUser, articleController.delete);
+router.delete('/delete', user.verifyUser, articleController.delete);
 
 module.exports = router;

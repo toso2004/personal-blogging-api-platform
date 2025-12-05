@@ -21,30 +21,40 @@ const articleController = {
     },
 
     create: async (req, res) =>{
-        const { title, content } = req.body;
+        const { title, content, author, tags} = req.body;
+        const user_id = req.user.user_id;
+
         try{
             if(!title || !content){
                 res.status(400).json({success: false, message: "To create an article you need both the title and content of the article"});
             }else{
-                const postArticle = await ArticleService.createArticle(req.body);
+                const postArticle = await ArticleService.createArticle({
+                    title,
+                    content,
+                    author,
+                    tags,
+                    user_id
+                });
                 res.status(200).json({success: true, postArticle});
-            }
+            }   
         }catch(e){
             res.status(500).json({success: false, message: "Something went wrong.Please try again later"});
+
+            console.log(e)
         }
     },
 
     update: async (req, res) =>{
-        const { id } = req.params;
         const { title, content, author, tags } = req.body;
+        const { user_id } = req.user;
 
         try{
             const updateArticle = await ArticleService.editArticle({
-                id,
                 title,
                 content,
                 author,
-                tags
+                tags,
+                user_id
             });
 
             res.status(200).json({
@@ -60,10 +70,11 @@ const articleController = {
     },
 
     delete: async (req, res) =>{
-        const { id } = req.params;
+    
+        const { user_id } = req.user;
 
         try{
-            const delArticle = await ArticleService.deleteArticle(id);
+            const delArticle = await ArticleService.deleteArticle({user_id});
             res.status(200).json({
                 success: true,
                 delArticle
