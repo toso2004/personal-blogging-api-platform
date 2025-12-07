@@ -42,4 +42,28 @@ async function loginController(req, res){
     } 
 }
 
-module.exports = { registerController, loginController};
+function tokenController(req, res){
+    const refreshToken = req.user;
+
+    try{
+        if(!refreshToken){
+            res.status(401).json({
+                success: false,
+                message: "Missing token"
+            })
+        }else{
+            const checkToken = AuthService.accessRefreshToken({refreshToken, accessToken});
+            res.status(200).json({
+                success: true,
+                data: checkToken
+            })
+        }
+    }catch(e){
+        res.status(e.statusCode || 500).json({
+            success: false,
+            message: e.message
+        })
+    } 
+}
+
+module.exports = { registerController, loginController, tokenController};

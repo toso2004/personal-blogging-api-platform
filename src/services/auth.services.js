@@ -1,6 +1,7 @@
 const db = require('../database/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 async function registerUser({ first_name, last_name, date_of_birth, email, password}){
 
@@ -39,17 +40,45 @@ async function loginUser({email, password}){
         throw error;
     }
 
-    //Create a jwt token
-    const token = jwt.sign(
+    //Access token
+    const accessToken = jwt.sign(
         {
             user_id: getUser.rows[0].user_id, 
             email: getUser.rows[0].email
         },
-        "tupperware",
-        {expiresIn: "1h"}
+        process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn: "10m"}
     );
 
-    return {getUser: getUser.rows[0], token};
+    //Refresh token
+    const refreshToken = jwt.sign(
+        {email : getUser.rows[0].email},
+        process.env.REFRESH_TOKEN_SECRET,
+        {expiresIn: "1d"}
+    );
+
+    return {getUser: getUser.rows[0], accessToken};
 }
 
-module.exports = {registerUser, loginUser};
+function accessRefreshToken({refreshToken, accessToken}){
+    
+    if(!refreshToken){
+        const error = new Error("Not authorized.Wrong or missing token");
+        error.statusCode = 401;
+        throw error;
+    }else{
+        accessToken = jwt.sign(
+            {
+                user_id: getUser.rows[0].user_id, 
+                email: getUser.rows[0].email
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            {expiresIn: "10m"}
+        );
+    }
+
+    return {accessToken};
+}
+
+
+module.exports = {registerUser, loginUser, accessRefreshToken};
