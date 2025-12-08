@@ -1,5 +1,5 @@
 const express = require('express');
-const AuthService = require('../services/auth.services');
+const { registerUser, loginUser }= require('../services/auth.services');
 
 async function registerController(req, res){
     const { first_name, last_name, date_of_birth, email, password } = req.body;
@@ -11,7 +11,7 @@ async function registerController(req, res){
                 message: "All fields are required in order to register a new account"
             });
         }else{
-            const newUser = await AuthService.registerUser({first_name, last_name, date_of_birth, email, password});
+            const newUser = await registerUser({first_name, last_name, date_of_birth, email, password});
             res.status(200).json({
                 success: true,
                 data: newUser
@@ -29,11 +29,28 @@ async function loginController(req, res){
     const { email, password } = req.body;
 
     try{
-        const { getUser, token } = await AuthService.loginUser({email, password});
-        res.status(200).json({
-            success: true,
-            data: getUser, token
-        })
+        if(email !== req.body.email || password !== req.body.password){
+            res.status(401).json({
+                success: false,
+                message: "Incorrect user details"
+            })
+        }else{
+            const { getUser, accessToken, refreshToken } = await loginUser({email, password});
+
+            res.cookie("BlogCookie", refreshToken,
+                {
+                    secure: true,
+                    httpOnly: true,
+                    expires: new Date(Date.now() + 900000)
+                }
+            );
+            
+            res.status(200).json({
+                success: true,
+                data: getUser, accessToken
+            });
+            
+        }    
     }catch(e){
         res.status(e.statusCode || 500).json({
             success: false,
@@ -42,7 +59,7 @@ async function loginController(req, res){
     } 
 }
 
-function tokenController(req, res){
+/*function tokenController(req, res){
     const refreshToken = req.user;
 
     try{
@@ -64,6 +81,6 @@ function tokenController(req, res){
             message: e.message
         })
     } 
-}
+}*/
 
-module.exports = { registerController, loginController, tokenController};
+module.exports = { registerController, loginController};

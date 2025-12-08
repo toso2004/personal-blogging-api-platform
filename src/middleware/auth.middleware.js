@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const cookie = require('cookie-parser');
 
+
 function verifyUser(req, res, next){
 
     const authHeader = req.headers.authorization;
@@ -29,45 +30,4 @@ function verifyUser(req, res, next){
     }   
 }
 
-//Assigning refresh token in http-only cookie
-function createCookie(req, res, next){
-
-    try{
-        const cookie = res.cookie("BlogCookie", refreshToken,
-            {
-                secure: true,
-                httpOnly: true,
-                expires: new Date(Date.now() + 900000)
-            }
-        );
-        
-        req.user = cookie;
-        next();
-    }catch{
-        res.status(401).json({
-            success: false,
-            message: "Unathorized"
-        })
-    }
-    
-}
-
-function verifyToken(req, res, next){
-
-
-    try{
-        const refreshToken = req.cookie.BlogCookie;
-        refreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-        req.user = refreshToken;
-        next();
-    }catch(e){
-        res.status(e.statusCode || 500).json({
-            succes: false,
-            message: e.message
-        });
-    }
-}
-
-
-
-module.exports = { verifyUser, createCookie, verifyToken } ;
+module.exports = { verifyUser} ;

@@ -57,28 +57,10 @@ async function loginUser({email, password}){
         {expiresIn: "1d"}
     );
 
-    return {getUser: getUser.rows[0], accessToken};
-}
-
-function accessRefreshToken({refreshToken, accessToken}){
-    
-    if(!refreshToken){
-        const error = new Error("Not authorized.Wrong or missing token");
-        error.statusCode = 401;
-        throw error;
-    }else{
-        accessToken = jwt.sign(
-            {
-                user_id: getUser.rows[0].user_id, 
-                email: getUser.rows[0].email
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: "10m"}
-        );
-    }
-
-    return {accessToken};
+    return {getUser: getUser.rows[0],refreshToken, accessToken};
 }
 
 
-module.exports = {registerUser, loginUser, accessRefreshToken};
+
+
+module.exports = {registerUser, loginUser};
