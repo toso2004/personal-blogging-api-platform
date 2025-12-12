@@ -22,7 +22,7 @@ router.post('/refresh', async (req, res) =>{
                     email: getUser.rows[0].email
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn: "10m"}
+                {expiresIn: "5m"}
             );
 
             //Rotate refresh token
@@ -31,9 +31,9 @@ router.post('/refresh', async (req, res) =>{
                     email: getUser.rows[0].email
                 },
                 process.env.REFRESH_TOKEN_SECRET,
-                {expiresIn: "1d"}
+                {expiresIn: "30d"}
             );
-            
+
             //Overwrite cookie with the new refresh token
             res.cookie("BlogCookie", newRefreshToken,
                 {
@@ -49,8 +49,9 @@ router.post('/refresh', async (req, res) =>{
                 SET token = $1,
                     isActive = true,
                     updated_at = NOW()
-                    RETURNING *`,
-                [newRefreshToken]);
+                    RETURNING *
+                    WHERE user_id = $2`,
+                [newRefreshToken, token.rows[0].user_id]);
             
             return results.rows[0];
 

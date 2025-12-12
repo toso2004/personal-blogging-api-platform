@@ -50,7 +50,7 @@ async function loginUser({email, password}){
             email: getUser.rows[0].email
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: "10m"}
+        {expiresIn: "5m"}
     );
 
     //Refresh token
@@ -60,7 +60,7 @@ async function loginUser({email, password}){
             user_id: getUser.rows[0].user_id
         },
         process.env.REFRESH_TOKEN_SECRET,
-        {expiresIn: "1d"}
+        {expiresIn: "30d"}
     );
 
     const refresh = await db.query(`INSERT INTO auth_token(token, user_id, isActive) 
@@ -71,7 +71,7 @@ async function loginUser({email, password}){
 }
 
 async function logoutUser({token, user_id}){
-    //Fix
+    
     const checkUser = await db.query("SELECT * FROM auth_token WHERE token = $1", [token]);
     if(!checkUser){
         const error = new Error("Unauthorized");
