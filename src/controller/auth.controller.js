@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser }= require('../services/auth.services');
+const { registerUser, loginUser, logoutUser }= require('../services/auth.services');
 
 async function registerController(req, res){
     const { first_name, last_name, date_of_birth, email, password } = req.body;
@@ -26,7 +26,8 @@ async function registerController(req, res){
 }
 
 async function loginController(req, res){
-    const { email, password } = req.body;
+    const { email, password} = req.body;
+    
 
     try{
         if(email !== req.body.email || password !== req.body.password){
@@ -35,7 +36,7 @@ async function loginController(req, res){
                 message: "Incorrect user details"
             })
         }else{
-            const { getUser, accessToken, refreshToken } = await loginUser({email, password});
+            const { getUser, accessToken, refreshToken} = await loginUser({email, password});
 
             res.cookie("BlogCookie", refreshToken,
                 {
@@ -47,7 +48,7 @@ async function loginController(req, res){
             
             res.status(200).json({
                 success: true,
-                data: getUser, accessToken
+                data: getUser, accessToken, refreshToken
             });
             
         }    
@@ -59,20 +60,24 @@ async function loginController(req, res){
     } 
 }
 
-/*function tokenController(req, res){
-    const refreshToken = req.user;
+
+async function logoutController(req, res){
+    const { email, password } = req.body;
+    const {user_id} = req.user
 
     try{
-        if(!refreshToken){
-            res.status(401).json({
-                success: false,
-                message: "Missing token"
-            })
+        if(email !== req.body.email || password !== req.body.password){
+        res.status(401).json({
+            success: false,
+            message: "Incorrect user details"
+        })
         }else{
-            const checkToken = AuthService.accessRefreshToken({refreshToken, accessToken});
+            const logout = await logoutUser({email, password, user_id});
+
             res.status(200).json({
                 success: true,
-                data: checkToken
+                logout,
+                message: "Logout successfull"
             })
         }
     }catch(e){
@@ -80,7 +85,8 @@ async function loginController(req, res){
             success: false,
             message: e.message
         })
-    } 
-}*/
+    }
+    
+}
 
-module.exports = { registerController, loginController};
+module.exports = { registerController, loginController, logoutController};
